@@ -1,0 +1,43 @@
+# declutter - Read html content without clutter from your Emacs
+
+declutter is a small Emacs addon that will help you with reading
+online content. It will remove all distractions and present you with
+readable html, straight inside your Emacs.
+
+declutter is also able to read articles behind paywall - ft.com, WSJ
+and so on.
+
+## Installation
+
+declutter depends on [json.el](https://github.com/thorstadt/json.el)
+and
+[shr.el](http://bzr.savannah.gnu.org/lh/emacs/trunk/annotate/head:/lisp/net/shr.el). `shr.el`
+is part of Emacs since 24.4 version.
+
+To install declutter, just copy `declutter.el` or `declutter.elc` to
+`$HOME/.emacs.d` folder or any other location listed in Emacs
+`load-path` variable.
+
+In your
+[Emacs init file](https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html),
+put:
+
+```el
+(require 'declutter)
+```
+
+Then, in Emacs:
+
+<kbd>M-x declutter [RET]</kbd>
+
+and enter url you'd like to visit.
+
+## Note
+
+declutter is using [outline.com](https://outline.com) to render the
+content and sometimes it will fail with internal error (received from
+`outline.com`). In that case, try url multiple times.
+
+## Bug reports & patches
+
+Feel free to report any issues you find or you have suggestions for improvements.
