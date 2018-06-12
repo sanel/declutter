@@ -77,9 +77,12 @@ own dedicated *html* buffer with parsed content."
 	  (shr-render-buffer (current-buffer)))))
 
 (defun declutter-under-point ()
-  "Tries to load url under point and runs (declutter-url) on it."
+  "Tries to load url under point and runs (declutter-url) on it. First it
+tries with (shr-url). If fails, it will try with (browse-url-url-at-point) and if
+that fails, it will report error."
   (interactive)
-  (let ((url (get-text-property (point) 'shr-url)))
+  (let* ((url (get-text-property (point) 'shr-url))
+         (url (if url url (browse-url-url-at-point))))
     (if url
         (declutter-url url)
         (message "No URL under point"))))

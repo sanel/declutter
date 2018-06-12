@@ -4,8 +4,8 @@ declutter is a small Emacs addon that will help you with reading
 online content. It will remove all distractions and present you with
 readable html, straight inside your Emacs.
 
-declutter is also able to read articles behind paywall - ft.com, WSJ
-and so on.
+declutter is also able to read articles behind paywall - Finacial
+Times, WSJ and so on.
 
 ## Installation
 
@@ -14,9 +14,8 @@ and
 [shr.el](http://bzr.savannah.gnu.org/lh/emacs/trunk/annotate/head:/lisp/net/shr.el). `shr.el`
 is part of Emacs since 24.4 version.
 
-To install declutter, just copy `declutter.el` or `declutter.elc` to
-`$HOME/.emacs.d` folder or any other location listed in Emacs
-`load-path` variable.
+To install declutter, just copy `declutter.el` to `$HOME/.emacs.d`
+folder or any other location listed in Emacs `load-path` variable.
 
 In your
 [Emacs init file](https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html),
@@ -31,6 +30,20 @@ Then, in Emacs:
 <kbd>M-x declutter [RET]</kbd>
 
 and enter url you'd like to visit.
+
+## Usage
+
+By default, declutter will open `*html*` buffer and render cleaned
+content in it. Actually, this is done by `shr.el` so all default
+shortcuts for it works here as well.
+
+declutter adds another useful function -
+`declutter-under-point`. When you read through the article and you'd
+like to open url, you place cursor over link and you have two options:
+
+  * You can use `shr-browse-url` (`v` key) which will open article *as is*
+  * Or you can use `declutter-under-point` to load that url and render
+    cleaned content in `*html*` buffer.
 
 ## Note
 
