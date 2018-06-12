@@ -48,8 +48,11 @@ like to open url, you place cursor over link and you have two options:
 ## Note
 
 declutter is using [outline.com](https://outline.com) to render the
-content and sometimes it will fail with internal error (received from
+content and sometimes can fail with internal error (received from
 `outline.com`). In that case, try url multiple times.
+
+Also regardingy privacy, be aware that `outline.com` **can see** what
+you browse. I'm not affiliated with `outline.com` in any way.
 
 ## Bug reports & patches
 
