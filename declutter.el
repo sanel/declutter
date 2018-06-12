@@ -1,5 +1,5 @@
 ;;; -*- indent-tabs-mode: nil -*-
-;;; declutter.el --- Read paywall sites without clutter
+;;; declutter.el --- Read html content and paywall sites without clutter
 
 ;; Copyright (c) 2018 Sanel Zukan
 ;;
@@ -25,7 +25,7 @@
 
 ;;; Commentary:
 
-;; Allows reading paywall sites without clutter. Uses outline.com service
+;; Allows reading paywall sites without clutter. Uses outline.com service for actual work.
 
 ;;; Installation:
 
@@ -76,13 +76,17 @@ own dedicated *html* buffer with parsed content."
 		 (declutter-get-html url))
 	  (shr-render-buffer (current-buffer)))))
 
+(defun declutter-get-url-under-point ()
+  "Tries to figure out is there any url under point. Returns nil if none."
+  (let ((url (get-text-property (point) 'shr-url)))
+       (if url
+           url
+           (browse-url-url-at-point))))
+
 (defun declutter-under-point ()
-  "Tries to load url under point and runs (declutter-url) on it. First it
-tries with (shr-url). If fails, it will try with (browse-url-url-at-point) and if
-that fails, it will report error."
+  "declutters url under point."
   (interactive)
-  (let* ((url (get-text-property (point) 'shr-url))
-         (url (if url url (browse-url-url-at-point))))
+  (let ((url (declutter-get-url-under-point)))
     (if url
         (declutter-url url)
         (message "No URL under point"))))
@@ -91,8 +95,12 @@ that fails, it will report error."
 (defun declutter (url)
   "Reads url and declutter it, using outline.com service."
   (interactive
-   (list
-    (read-string (format "Enter URL: ") nil nil nil)))
+   (let* ((url    (declutter-get-url-under-point))
+          (prompt (if url
+                      (format "URL (default: %s): " url)
+                      "URL: ")))
+     (list
+      (read-string prompt nil nil url))))
   (declutter-url url))
 
 (provide 'declutter)
