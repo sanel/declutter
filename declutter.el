@@ -5,7 +5,7 @@
 ;;
 ;; Author: Sanel Zukan <sanelz@gmail.com>
 ;; URL: http://www.github.com/sanel/declutter
-;; Version: 0.1.0
+;; Version: 0.2.0
 ;; Keywords: html, web browser 
 
 ;; This program is free software: you can redistribute it and/or modify
@@ -71,10 +71,12 @@ and retrieve html part from it."
 Creates temporary buffer just to get html, as (shr-render-buffer) will create
 own dedicated *html* buffer with parsed content."
   (with-temp-buffer
-    (prog1
-		(insert
-		 (declutter-get-html url))
-	  (shr-render-buffer (current-buffer)))))
+    (let ((content (declutter-get-html url)))
+      (if (not content)
+          (message "Zero reply from outline.com. This usually means it wasn't able to render the article.")
+          (progn
+            (insert content)
+            (shr-render-buffer (current-buffer)))))))
 
 (defun declutter-get-url-under-point ()
   "Tries to figure out is there any url under point. Returns nil if none."
