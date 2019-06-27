@@ -5,7 +5,8 @@ online content. It will remove all distractions and present you with
 readable html, straight inside your Emacs.
 
 declutter is also able to read articles behind paywall - Finacial
-Times, WSJ and so on.
+Times, WSJ and so on. Please read `Restriction Hacking` down below,
+in case you are not able to read the content.
 
 ## Installation
 
@@ -53,6 +54,16 @@ content and sometimes can fail with internal error (received from
 
 Also regardingy privacy, be aware that `outline.com` **can see** what
 you browse. I'm not affiliated with `outline.com` in any way.
+
+## Restriction Hacking
+
+As from May 2019 (at least the period I was able to track),
+`outline.com` will report for some sites this:
+`We're sorry, but this URL is not supported by Outline`.
+
+To bypass it, use some url shortener (like https://bitly.com) and
+short destination url. Pass that shortened url to declutter and it
+will be able to render the content again.
 
 ## Bug reports & patches
 
