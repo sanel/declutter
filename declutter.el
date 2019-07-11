@@ -1,11 +1,11 @@
 ;;; -*- indent-tabs-mode: nil -*-
 ;;; declutter.el --- Read html content and paywall sites without clutter
 
-;; Copyright (c) 2018 Sanel Zukan
+;; Copyright (c) 2019 Sanel Zukan
 ;;
 ;; Author: Sanel Zukan <sanelz@gmail.com>
 ;; URL: http://www.github.com/sanel/declutter
-;; Version: 0.2.0
+;; Version: 0.3.0
 ;; Keywords: html, web browser 
 
 ;; This program is free software: you can redistribute it and/or modify
@@ -46,17 +46,24 @@
   :prefix "declutter-"
   :group 'applications)
 
-(defcustom outline-api "https://outlineapi.com/v3/parse_article?source_url="
+(defcustom outline-api "https://outlineapi.com/article?source_url="
   "Outline service, used to get cleaned content."
+ :type 'string
+  :group 'declutter)
+
+(defcustom declutter-user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36"
+  "Custom user agent."
   :type 'string
   :group 'declutter)
 
 (defun declutter-fetch-json (url)
   "Tries to get json from given url."
   (with-temp-buffer
-    (url-insert-file-contents url)
-    (let ((json-false :false))
-      (json-read))))
+    (let ((url-request-extra-headers '(("Referer" . "https://outline.com/")))
+          (url-user-agent (concat "User-Agent: " declutter-user-agent "\r\n")))
+      (url-insert-file-contents url)
+      (let ((json-false :false))
+        (json-read)))))
 
 (defun declutter-get-html (url)
   "Construct properl url and call outline.com service. Expects json response
