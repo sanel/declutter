@@ -5,7 +5,7 @@
 ;;
 ;; Author: Sanel Zukan <sanelz@gmail.com>
 ;; URL: http://www.github.com/sanel/declutter
-;; Version: 0.3.0
+;; Version: 0.4.0
 ;; Keywords: html, web browser 
 
 ;; This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@
 
 ;;; Commentary:
 
-;; Allows reading paywall sites without clutter. Uses outline.com service for actual work.
+;; Allows reading sites without clutter. Uses outline.com service or lynx for actual work.
 
 ;;; Installation:
 
@@ -48,12 +48,18 @@
 
 (defcustom outline-api "https://outlineapi.com/article?source_url="
   "Outline service, used to get cleaned content."
- :type 'string
+  :type 'string
   :group 'declutter)
 
 (defcustom declutter-user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36"
   "Custom user agent."
   :type 'string
+  :group 'declutter)
+
+(defcustom declutter-engine 'outline
+  "Engine used to visit and render url. Values are 'outline for
+using outline.com service and 'lynx for using local lynx installation."
+  :type 'symbol
   :group 'declutter)
 
 (defun declutter-fetch-json (url)
@@ -73,10 +79,10 @@ and retrieve html part from it."
     (cdr
      (assoc 'html (assoc 'data response)))))
 
-(defun declutter-url (url)
+(defun declutter-url-outline (url)
   "Calls (declutter-get-html) inside new buffer and parses it as html.
 Creates temporary buffer just to get html, as (shr-render-buffer) will create
-own dedicated *html* buffer with parsed content."
+own dedicated *html* buffer with parsed content. Use outline-api."
   (with-temp-buffer
     (let ((content (declutter-get-html url)))
       (if (not content)
@@ -84,6 +90,25 @@ own dedicated *html* buffer with parsed content."
           (progn
             (insert content)
             (shr-render-buffer (current-buffer)))))))
+
+(defun declutter-url-lynx (url)
+  "Use lynx to declutter url."
+  (let* ((agent (if declutter-user-agent
+                    (concat "-useragent=\"" declutter-user-agent "\"")))
+         (content (shell-command-to-string (concat "lynx " agent " -dump " url))))
+    (if (not content)
+      (message "No content from lynx")
+      (with-current-buffer (pop-to-buffer "*declutter*")
+        (save-excursion
+          (erase-buffer)
+          (insert content))))))
+
+(defun declutter-url (url)
+  "Depending on declutter-engine variable, call appropriate declutter-url-* functions."
+  (cond
+   ((eq 'outline declutter-engine) (declutter-url-outline url))
+   ((eq 'lynx declutter-engine) (declutter-url-lynx url))
+   (message "Unknown decluttering engine. Use 'outline or 'lynx.")))
 
 (defun declutter-get-url-under-point ()
   "Tries to figure out is there any url under point. Returns nil if none."
