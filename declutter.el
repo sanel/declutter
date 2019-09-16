@@ -108,7 +108,7 @@ own dedicated *html* buffer with parsed content. Use outline-api."
   (cond
    ((eq 'outline declutter-engine) (declutter-url-outline url))
    ((eq 'lynx declutter-engine) (declutter-url-lynx url))
-   (message "Unknown decluttering engine. Use 'outline or 'lynx.")))
+   (t (message "Unknown decluttering engine. Use 'outline or 'lynx."))))
 
 (defun declutter-get-url-under-point ()
   "Tries to figure out is there any url under point. Returns nil if none."
