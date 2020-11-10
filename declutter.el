@@ -46,7 +46,7 @@
   :prefix "declutter-"
   :group 'applications)
 
-(defcustom outline-api "https://outlineapi.com/article?source_url="
+(defcustom outline-api "https://api.outline.com/v3/parse_article?source_url="
   "Outline service, used to get cleaned content."
   :type 'string
   :group 'declutter)
