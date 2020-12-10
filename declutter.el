@@ -87,17 +87,23 @@ and retrieve html part from it."
     (cdr
      (assoc 'html (assoc 'data response)))))
 
+(defun declutter-render-content (content htmlp)
+  "Assuming content is html string, render it in *declutter* buffer as html
+or just display it, depending if htmlp was set to true."
+  (with-current-buffer (pop-to-buffer "*declutter*")
+    (save-excursion
+      (erase-buffer)
+      (insert content)
+      ;; shr-render-buffer will start own *html* buffer, so use shr-render-region
+      (when htmlp
+        (shr-render-region (point-min) (point-max))))))
+
 (defun declutter-url-outline (url)
-  "Calls (declutter-get-html) inside new buffer and parses it as html.
-Creates temporary buffer just to get html, as (shr-render-buffer) will create
-own dedicated *html* buffer with parsed content. Use outline-api."
-  (with-temp-buffer
-    (let ((content (declutter-get-html url)))
-      (if (not content)
-          (message "Zero reply from outline.com. This usually means it wasn't able to render the article.")
-          (progn
-            (insert content)
-            (shr-render-buffer (current-buffer)))))))
+  "Use Outline API to declutter url."
+  (let ((content (declutter-get-html url)))
+    (if (not content)
+      (message "Zero reply from outline.com. This usually means it wasn't able to render the article.")
+      (declutter-render-content content t))))
 
 (defun declutter-url-lynx (url)
   "Use lynx to declutter url."
@@ -107,20 +113,15 @@ own dedicated *html* buffer with parsed content. Use outline-api."
          (content (shell-command-to-string (concat path agent " -dump " url))))
     (if (not content)
       (message "No content from lynx")
-      (with-current-buffer (pop-to-buffer "*declutter*")
-        (save-excursion
-          (erase-buffer)
-          (insert content))))))
+      (declutter-render-content content nil))))
 
 (defun declutter-url-rdrview (url)
   "Use rdrview to declutter url."
   (let* ((path (or declutter-engine-path "rdrview"))
          (content (shell-command-to-string (concat path " -H " url))))
     (if (not content)
-      (message "No content from rdrview declutter")
-      (with-temp-buffer
-        (insert content)
-        (shr-render-buffer (current-buffer))))))
+      (message "No content from rdrview")
+      (declutter-render-content content t))))
 
 (defun declutter-url (url)
   "Depending on declutter-engine variable, call appropriate declutter-url-* functions."
