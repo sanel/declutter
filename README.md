@@ -4,9 +4,11 @@ declutter is a small Emacs addon that will help you with reading
 online content. It will remove all distractions and present you with
 readable html, straight inside your Emacs.
 
-declutter is also able to read articles behind paywall - Finacial
-Times, WSJ and so on. Please read `Restriction Hacking` down below,
-in case you are not able to read the content.
+declutter can render content using:
+
+ * [outline.com API](https://outline.com/)
+ * [lynx](https://en.wikipedia.org/wiki/Lynx_(web_browser))
+ * [rdrview](https://github.com/eafer/rdrview)
 
 ## Installation
 
@@ -34,7 +36,7 @@ and enter url you'd like to visit.
 
 ## Usage
 
-By default, declutter will open `*html*` buffer and render cleaned
+By default, declutter will open `*declutter*` buffer and render cleaned
 content in it. Actually, this is done by `shr.el` so all default
 shortcuts for it works here as well.
 
@@ -44,12 +46,20 @@ like to open url, you place cursor over link and you have two options:
 
   * You can use `shr-browse-url` (`v` key) which will open article *as is*
   * Or you can use `declutter-under-point` to load that url and render
-    cleaned content in `*html*` buffer.
+    cleaned content in `*declutter*` buffer.
+
+To change rendering engine (default is outline.com API), use this:
+
+```el
+(setq declutter-engine 'lynx)     ; lynx will get and render html
+; or
+(setq declutter-engine 'rdrview)  ; rdrview will get and render html
+```
 
 ## Note
 
-declutter is using [outline.com](https://outline.com) to render the
-content and sometimes can fail with internal error (received from
+When declutter is using [outline.com](https://outline.com) to render
+the content and sometimes can fail with internal error (received from
 `outline.com`). In that case, try url multiple times.
 
 Also regardingy privacy, be aware that `outline.com` **can see** what
