@@ -1,7 +1,7 @@
 ;;; -*- indent-tabs-mode: nil -*-
 ;;; declutter.el --- Read html content and paywall sites without clutter
 
-;; Copyright (c) 2019 Sanel Zukan
+;; Copyright (c) 2019-2020 Sanel Zukan
 ;;
 ;; Author: Sanel Zukan <sanelz@gmail.com>
 ;; URL: http://www.github.com/sanel/declutter
@@ -58,8 +58,16 @@
 
 (defcustom declutter-engine 'outline
   "Engine used to visit and render url. Values are 'outline for
-using outline.com service and 'lynx for using local lynx installation."
+using outline.com service, 'lynx for using local lynx installation or
+'rdrview for https://github.com/eafer/rdrview."
   :type 'symbol
+  :group 'declutter)
+
+(defcustom declutter-engine-path nil
+  "If lynx or rdrview was used as rendering engine, this will be
+the path to the application binary. If set to nil but the engine is lynx or rdrview,
+it will call them as is, assuming they are in PATH."
+  :type 'string
   :group 'declutter)
 
 (defun declutter-fetch-json (url)
@@ -95,7 +103,8 @@ own dedicated *html* buffer with parsed content. Use outline-api."
   "Use lynx to declutter url."
   (let* ((agent (if declutter-user-agent
                     (concat "-useragent=\"" declutter-user-agent "\"")))
-         (content (shell-command-to-string (concat "lynx " agent " -dump " url))))
+         (path (or declutter-engine-path "lynx"))
+         (content (shell-command-to-string (concat path agent " -dump " url))))
     (if (not content)
       (message "No content from lynx")
       (with-current-buffer (pop-to-buffer "*declutter*")
@@ -103,12 +112,23 @@ own dedicated *html* buffer with parsed content. Use outline-api."
           (erase-buffer)
           (insert content))))))
 
+(defun declutter-url-rdrview (url)
+  "Use rdrview to declutter url."
+  (let* ((path (or declutter-engine-path "rdrview"))
+         (content (shell-command-to-string (concat path " -H " url))))
+    (if (not content)
+      (message "No content from rdrview declutter")
+      (with-temp-buffer
+        (insert content)
+        (shr-render-buffer (current-buffer))))))
+
 (defun declutter-url (url)
   "Depending on declutter-engine variable, call appropriate declutter-url-* functions."
   (cond
    ((eq 'outline declutter-engine) (declutter-url-outline url))
    ((eq 'lynx declutter-engine) (declutter-url-lynx url))
-   (t (message "Unknown decluttering engine. Use 'outline or 'lynx."))))
+   ((eq 'rdrview declutter-engine) (declutter-url-rdrview url))
+   (t (message "Unknown decluttering engine. Use 'outline, 'lynx or 'rdrview."))))
 
 (defun declutter-get-url-under-point ()
   "Tries to figure out is there any url under point. Returns nil if none."
