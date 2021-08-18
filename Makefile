@@ -1,6 +1,6 @@
-# declutter.el --- Read paywall sites
+# declutter.el --- Read html content and (some) paywall sites without clutter
 #
-# Copyright (c) 2018 Sanel Zukan
+# Copyright (c) 2018-2021 Sanel Zukan
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

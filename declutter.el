@@ -1,11 +1,11 @@
 ;;; -*- indent-tabs-mode: nil -*-
-;;; declutter.el --- Read html content and paywall sites without clutter
+;;; declutter.el --- Read html content and (some) paywall sites without clutter
 
-;; Copyright (c) 2019-2020 Sanel Zukan
+;; Copyright (c) 2019-2021 Sanel Zukan
 ;;
 ;; Author: Sanel Zukan <sanelz@gmail.com>
 ;; URL: http://www.github.com/sanel/declutter
-;; Version: 0.4.0
+;; Version: 0.2.0
 ;; Keywords: html, web browser 
 
 ;; This program is free software: you can redistribute it and/or modify
@@ -70,20 +70,26 @@ it will call them as is, assuming they are in PATH."
   :type 'string
   :group 'declutter)
 
-(defun declutter-fetch-json (url)
-  "Tries to get json from given url."
+(defun declutter-fetch-url (url referer jsonp)
+  "Tries to get content from given url. If jsonp is true, parse it to json list.
+Referer is necessary for outline.com."
   (with-temp-buffer
-    (let ((url-request-extra-headers '(("Referer" . "https://outline.com/")))
+    (let ((url-request-extra-headers (if referer
+                                       (list (cons "Referer" referer))))
           (url-user-agent (concat "User-Agent: " declutter-user-agent "\r\n")))
       (url-insert-file-contents url)
-      (let ((json-false :false))
-        (json-read)))))
+      (if jsonp
+        ;; TODO: support for native JSON (https://emacs.stackexchange.com/a/38482)
+        (let ((json-false :false))
+          (json-read))
+        ;; extract actual content
+        (buffer-substring-no-properties (point-min) (point-max))))))
 
-(defun declutter-get-html (url)
+(defun declutter-get-html-from-outline (url)
   "Construct properl url and call outline.com service. Expects json response
 and retrieve html part from it."
   (let* ((full-url (concat outline-api (url-hexify-string url)))
-         (response (declutter-fetch-json full-url)))
+         (response (declutter-fetch-url full-url "https://outline.com/" t)))
     (cdr
      (assoc 'html (assoc 'data response)))))
 
@@ -100,7 +106,7 @@ or just display it, depending if htmlp was set to true."
 
 (defun declutter-url-outline (url)
   "Use Outline API to declutter url."
-  (let ((content (declutter-get-html url)))
+  (let ((content (declutter-get-html-from-outline url)))
     (if (not content)
       (message "Zero reply from outline.com. This usually means it wasn't able to render the article.")
       (declutter-render-content content t))))
@@ -110,7 +116,7 @@ or just display it, depending if htmlp was set to true."
   (let* ((agent (if declutter-user-agent
                     (concat "-useragent=\"" declutter-user-agent "\"")))
          (path (or declutter-engine-path "lynx"))
-         (content (shell-command-to-string (concat path agent " -dump " url))))
+         (content (shell-command-to-string (concat path " " agent " -dump " url))))
     (if (not content)
       (message "No content from lynx")
       (declutter-render-content content nil))))
@@ -123,12 +129,35 @@ or just display it, depending if htmlp was set to true."
       (message "No content from rdrview")
       (declutter-render-content content t))))
 
+(defun declutter-eww-readable ()
+  (unwind-protect
+      (progn
+        (eww-readable)
+        ;; declutter is using fundamental-mode
+        (fundamental-mode))
+    (remove-hook 'eww-after-render-hook 'declutter-eww-readable)))
+
+(defun declutter-url-eww (url)
+  "Use eww (Emacs builtin web browser) to decluter url."
+  ;; This function is loading eww and with eww-after-render-hook will call eww-readable.
+  ;; Sadly, eww doesn't have easy way to render html with eww-readable due many stateful
+  ;; operations, so calling declutter-fetch-url and passing content to eww/eww-readable
+  ;; does not work.
+  (let (;; declutter-fetch-url is not used here, so we must set user agent for eww.
+        (url-user-agent (concat "User-Agent: " declutter-user-agent "\r\n")))
+    (pop-to-buffer "*declutter*")
+    ;; switch to eww-mode or eww will pop out own buffer
+    (eww-mode)
+    (add-hook 'eww-after-render-hook 'declutter-eww-readable)
+    (eww url)))
+
 (defun declutter-url (url)
   "Depending on declutter-engine variable, call appropriate declutter-url-* functions."
   (cond
    ((eq 'outline declutter-engine) (declutter-url-outline url))
    ((eq 'lynx declutter-engine) (declutter-url-lynx url))
    ((eq 'rdrview declutter-engine) (declutter-url-rdrview url))
+   ((eq 'eww declutter-engine) (declutter-url-eww url))
    (t (message "Unknown decluttering engine. Use 'outline, 'lynx or 'rdrview."))))
 
 (defun declutter-get-url-under-point ()

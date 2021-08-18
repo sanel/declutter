@@ -9,11 +9,12 @@ declutter can render content using:
  * [outline.com API](https://outline.com/)
  * [lynx](https://en.wikipedia.org/wiki/Lynx_(web_browser))
  * [rdrview](https://github.com/eafer/rdrview)
+ * [EWW](https://www.gnu.org/software/emacs/manual/html_mono/eww.html) - Emacs builtin browser
 
 ## Installation
 
 declutter depends on [json.el](https://github.com/thorstadt/json.el)
-and
+(if you are using `outline.com` backend) and
 [shr.el](http://bzr.savannah.gnu.org/lh/emacs/trunk/annotate/head:/lisp/net/shr.el). `shr.el`
 is part of Emacs since 24.4 version.
 
@@ -54,6 +55,8 @@ To change rendering engine (default is outline.com API), use this:
 (setq declutter-engine 'lynx)     ; lynx will get and render html
 ; or
 (setq declutter-engine 'rdrview)  ; rdrview will get and render html
+; or
+(setq declutter-engine 'eww)      ; eww will get and render html
 ```
 
 ## Note
