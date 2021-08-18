@@ -124,7 +124,7 @@ or just display it, depending if htmlp was set to true."
 (defun declutter-url-rdrview (url)
   "Use rdrview to declutter url."
   (let* ((path (or declutter-engine-path "rdrview"))
-         (content (shell-command-to-string (concat path " -H " url))))
+         (content (shell-command-to-string (concat path " -A \"" declutter-user-agent "\" -H " url))))
     (if (not content)
       (message "No content from rdrview")
       (declutter-render-content content t))))
