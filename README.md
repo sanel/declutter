@@ -59,6 +59,31 @@ To change rendering engine (default is outline.com API), use this:
 (setq declutter-engine 'eww)      ; eww will get and render html
 ```
 
+For `lynx` and `rdrview` engines, you can set a custom path to the
+program binary, with `declutter-engine-path`. For example, if you have
+`rdrview` installed in `/opt/rdrview/bin/rdrview`, set it with:
+
+```el
+(setq declutter-engine-path "/opt/rdrview/bin/rdrview")
+```
+
+## Configuration
+
+declutter doesn't have many configuration options, except of
+`declutter-engine`, `declutter-engine-path` and `declutter-user-agent`
+(where you can override default user-agent string), but if you want to
+set default font of rendered content or indentation, check
+[shr.el](https://github.com/emacs-mirror/emacs/blob/master/lisp/net/shr.el)
+options.
+
+For example, to use default Emacs fonts and add margins, evaluate this:
+
+```el
+(setq
+ shr-use-fonts nil
+ shr-indentation 2)
+```
+
 ## Note
 
 When declutter is using [outline.com](https://outline.com) to render
