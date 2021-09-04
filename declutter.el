@@ -178,7 +178,7 @@ or just display it, depending if htmlp was set to true."
 
 ;;;###autoload
 (defun declutter (url)
-  "Reads url and declutter it, using outline.com service."
+  "Read URL and declutter it, using outline.com service."
   (interactive
    (let* ((url    (declutter-get-url-under-point))
           (prompt (if url
