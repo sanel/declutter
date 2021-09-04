@@ -40,6 +40,7 @@
 
 (require 'json)
 (require 'shr)
+(require 'eww)  ; maybe load it lazily
 
 (defgroup declutter nil
   "Declutter web sites."
