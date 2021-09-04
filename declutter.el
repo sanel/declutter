@@ -1,12 +1,12 @@
-;;; -*- indent-tabs-mode: nil -*-
 ;;; declutter.el --- Read html content and (some) paywall sites without clutter
+;;; -*- indent-tabs-mode: nil -*-
 
 ;; Copyright (c) 2019-2021 Sanel Zukan
 ;;
 ;; Author: Sanel Zukan <sanelz@gmail.com>
 ;; URL: http://www.github.com/sanel/declutter
 ;; Version: 0.2.0
-;; Keywords: html, web browser 
+;; Keywords: html, web browser
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 ;;; Commentary:
 
-;; Allows reading sites without clutter. Uses outline.com service or lynx for actual work.
+;; Allows reading sites without clutter.  Uses outline.com service or lynx for actual work.
 
 ;;; Installation:
 
@@ -58,22 +58,23 @@
   :group 'declutter)
 
 (defcustom declutter-engine 'outline
-  "Engine used to visit and render url. Values are 'outline for
-using outline.com service, 'lynx for using local lynx installation or
-'rdrview for https://github.com/eafer/rdrview."
+  "Engine used to visit and render URL.
+Values are 'outline for using outline.com service, 'lynx for using local lynx
+installation or 'rdrview for https://github.com/eafer/rdrview."
   :type 'symbol
   :group 'declutter)
 
 (defcustom declutter-engine-path nil
-  "If lynx or rdrview was used as rendering engine, this will be
-the path to the application binary. If set to nil but the engine is lynx or rdrview,
-it will call them as is, assuming they are in PATH."
+  "Path for engine program.
+If lynx or rdrview was used as rendering engine, this will be the path
+to the application binary.  If set to nil but the engine is lynx or
+rdrview, it will call them as is, assuming they are in PATH."
   :type 'string
   :group 'declutter)
 
 (defun declutter-fetch-url (url referer jsonp)
-  "Tries to get content from given url. If jsonp is true, parse it to json list.
-Referer is necessary for outline.com."
+  "Try to get content from given URL.
+If JSONP is true, parse it to json list.  REFERER is necessary for outline.com."
   (with-temp-buffer
     (let ((url-request-extra-headers (if referer
                                        (list (cons "Referer" referer))))
@@ -87,16 +88,17 @@ Referer is necessary for outline.com."
         (buffer-substring-no-properties (point-min) (point-max))))))
 
 (defun declutter-get-html-from-outline (url)
-  "Construct properl url and call outline.com service. Expects json response
-and retrieve html part from it."
+  "Construct properl URL and call outline.com service.
+Expects json response and retrieve html part from it."
   (let* ((full-url (concat outline-api (url-hexify-string url)))
          (response (declutter-fetch-url full-url "https://outline.com/" t)))
     (cdr
      (assoc 'html (assoc 'data response)))))
 
 (defun declutter-render-content (content htmlp)
-  "Assuming content is html string, render it in *declutter* buffer as html
-or just display it, depending if htmlp was set to true."
+  "Render in *declutter* buffer.
+Assuming CONTENT is html string, render it in named buffer as html
+or just display it, depending if HTMLP was set to true."
   (with-current-buffer (pop-to-buffer "*declutter*")
     (save-excursion
       (erase-buffer)
@@ -106,14 +108,14 @@ or just display it, depending if htmlp was set to true."
         (shr-render-region (point-min) (point-max))))))
 
 (defun declutter-url-outline (url)
-  "Use Outline API to declutter url."
+  "Use Outline API to declutter URL."
   (let ((content (declutter-get-html-from-outline url)))
     (if (not content)
       (message "Zero reply from outline.com. This usually means it wasn't able to render the article.")
       (declutter-render-content content t))))
 
 (defun declutter-url-lynx (url)
-  "Use lynx to declutter url."
+  "Use lynx to declutter URL."
   (let* ((agent (if declutter-user-agent
                     (concat "-useragent=\"" declutter-user-agent "\"")))
          (path (or declutter-engine-path "lynx"))
@@ -123,7 +125,7 @@ or just display it, depending if htmlp was set to true."
       (declutter-render-content content nil))))
 
 (defun declutter-url-rdrview (url)
-  "Use rdrview to declutter url."
+  "Use rdrview to declutter URL."
   (let* ((path (or declutter-engine-path "rdrview"))
          (content (shell-command-to-string (concat path " -A \"" declutter-user-agent "\" -H " url))))
     (if (not content)
@@ -131,6 +133,7 @@ or just display it, depending if htmlp was set to true."
       (declutter-render-content content t))))
 
 (defun declutter-eww-readable ()
+  "Call 'eww-readable' in *declutter* buffer."
   (unwind-protect
       (progn
         (eww-readable)
@@ -139,7 +142,7 @@ or just display it, depending if htmlp was set to true."
     (remove-hook 'eww-after-render-hook 'declutter-eww-readable)))
 
 (defun declutter-url-eww (url)
-  "Use eww (Emacs builtin web browser) to decluter url."
+  "Use eww (Emacs builtin web browser) to decluter URL."
   ;; This function is loading eww and with eww-after-render-hook will call eww-readable.
   ;; Sadly, eww doesn't have easy way to render html with eww-readable due many stateful
   ;; operations, so calling declutter-fetch-url and passing content to eww/eww-readable
@@ -162,14 +165,15 @@ or just display it, depending if htmlp was set to true."
    (t (message "Unknown decluttering engine. Use 'outline, 'lynx or 'rdrview."))))
 
 (defun declutter-get-url-under-point ()
-  "Tries to figure out is there any url under point. Returns nil if none."
+  "Try to figure out is there any URL under point.
+Returns nil if none."
   (let ((url (get-text-property (point) 'shr-url)))
        (if url
            url
            (browse-url-url-at-point))))
 
 (defun declutter-under-point ()
-  "declutters url under point."
+  "Declutters URL under point."
   (interactive)
   (let ((url (declutter-get-url-under-point)))
     (if url
