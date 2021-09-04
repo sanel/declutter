@@ -57,6 +57,8 @@ To change rendering engine (default is outline.com API), use this:
 (setq declutter-engine 'rdrview)  ; rdrview will get and render html
 ; or
 (setq declutter-engine 'eww)      ; eww will get and render html
+; or
+(setq declutter-engine 'outline)  ; outline.com will get and render html
 ```
 
 For `lynx` and `rdrview` engines, you can set a custom path to the
@@ -76,7 +78,7 @@ set default font of rendered content or indentation, check
 [shr.el](https://github.com/emacs-mirror/emacs/blob/master/lisp/net/shr.el)
 options.
 
-For example, to use default Emacs fonts and add margins, evaluate this:
+For example, to use default Emacs fonts and add margins, set this:
 
 ```el
 (setq
