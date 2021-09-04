@@ -6,7 +6,8 @@
 ;; Author: Sanel Zukan <sanelz@gmail.com>
 ;; URL: http://www.github.com/sanel/declutter
 ;; Version: 0.2.0
-;; Keywords: html, web browser
+;; Keywords: html, hypermedia, terminals
+;; Package-Requires: ((emacs "25.1"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -47,7 +48,7 @@
   :prefix "declutter-"
   :group 'applications)
 
-(defcustom outline-api "https://api.outline.com/v3/parse_article?source_url="
+(defcustom declutter-outline-api-url "https://api.outline.com/v3/parse_article?source_url="
   "Outline service, used to get cleaned content."
   :type 'string
   :group 'declutter)
@@ -90,7 +91,7 @@ If JSONP is true, parse it to json list.  REFERER is necessary for outline.com."
 (defun declutter-get-html-from-outline (url)
   "Construct properl URL and call outline.com service.
 Expects json response and retrieve html part from it."
-  (let* ((full-url (concat outline-api (url-hexify-string url)))
+  (let* ((full-url (concat declutter-outline-api-url (url-hexify-string url)))
          (response (declutter-fetch-url full-url "https://outline.com/" t)))
     (cdr
      (assoc 'html (assoc 'data response)))))
@@ -139,7 +140,7 @@ or just display it, depending if HTMLP was set to true."
         (eww-readable)
         ;; declutter is using fundamental-mode
         (fundamental-mode))
-    (remove-hook 'eww-after-render-hook 'declutter-eww-readable)))
+    (remove-hook 'eww-after-render-hook #'declutter-eww-readable)))
 
 (defun declutter-url-eww (url)
   "Use eww (Emacs builtin web browser) to decluter URL."
@@ -152,11 +153,11 @@ or just display it, depending if HTMLP was set to true."
     (pop-to-buffer "*declutter*")
     ;; switch to eww-mode or eww will pop out own buffer
     (eww-mode)
-    (add-hook 'eww-after-render-hook 'declutter-eww-readable)
+    (add-hook 'eww-after-render-hook #'declutter-eww-readable)
     (eww url)))
 
 (defun declutter-url (url)
-  "Depending on declutter-engine variable, call appropriate declutter-url-* functions."
+  "Depending on declutter-engine variable, call appropriate functions."
   (cond
    ((eq 'outline declutter-engine) (declutter-url-outline url))
    ((eq 'lynx declutter-engine) (declutter-url-lynx url))
