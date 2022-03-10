@@ -87,9 +87,9 @@ For example, to use default Emacs fonts and add margins, set this:
 
 ## Note
 
-When declutter is using [txtify.it](https://txtify.it) to render be
-aware that `txtify.it` **can see** what you browse. I'm not affiliated
-with `txtify.it` in any way.
+When declutter is using [txtify.it](https://txtify.it) backend to
+render the content, be aware that `txtify.it` **can see** what you
+browse. I'm not affiliated with `txtify.it` in any way.
 
 ## Bug reports & patches
 
