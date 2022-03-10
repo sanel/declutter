@@ -6,16 +6,15 @@ readable html, straight inside your Emacs.
 
 declutter can render content using:
 
- * [outline.com API](https://outline.com/)
  * [lynx](https://en.wikipedia.org/wiki/Lynx_(web_browser))
  * [rdrview](https://github.com/eafer/rdrview)
  * [EWW](https://www.gnu.org/software/emacs/manual/html_mono/eww.html) - Emacs builtin browser
+ * [txtify.it](https://txtify.it/)
 
 ## Installation
 
 declutter depends on [json.el](https://github.com/thorstadt/json.el)
-(if you are using `outline.com` backend) and
-[shr.el](http://bzr.savannah.gnu.org/lh/emacs/trunk/annotate/head:/lisp/net/shr.el). `shr.el`
+and [shr.el](http://bzr.savannah.gnu.org/lh/emacs/trunk/annotate/head:/lisp/net/shr.el). `shr.el`
 is part of Emacs since 24.4 version.
 
 To install declutter, just copy `declutter.el` to `$HOME/.emacs.d`
@@ -58,7 +57,7 @@ To change rendering engine (default is outline.com API), use this:
 ; or
 (setq declutter-engine 'eww)      ; eww will get and render html
 ; or
-(setq declutter-engine 'outline)  ; outline.com will get and render html
+(setq declutter-engine 'txtify)   ; txtify.it will get and render html
 ```
 
 For `lynx` and `rdrview` engines, you can set a custom path to the
@@ -88,22 +87,9 @@ For example, to use default Emacs fonts and add margins, set this:
 
 ## Note
 
-When declutter is using [outline.com](https://outline.com) to render
-the content and sometimes can fail with internal error (received from
-`outline.com`). In that case, try url multiple times.
-
-Also regardingy privacy, be aware that `outline.com` **can see** what
-you browse. I'm not affiliated with `outline.com` in any way.
-
-## Restriction Hacking
-
-As from May 2019 (at least the period I was able to track),
-`outline.com` will report for some sites this:
-`We're sorry, but this URL is not supported by Outline`.
-
-To bypass it, use some url shortener (like https://bitly.com) and
-short destination url. Pass that shortened url to declutter and it
-will be able to render the content again.
+When declutter is using [txtify.it](https://txtify.it) to render be
+aware that `txtify.it` **can see** what you browse. I'm not affiliated
+with `txtify.it` in any way.
 
 ## Bug reports & patches
 
